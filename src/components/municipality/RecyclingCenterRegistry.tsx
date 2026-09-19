@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "@/lib/apiConfig";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +35,7 @@ export const RecyclingCenterRegistry = () => {
 
   const fetchCenters = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/recycling-centers');
+      const response = await fetch(`${API_BASE_URL}/recycling-centers`);
       const data = await response.json();
       console.log('Fetched centers:', data);
       setCenters(data);
@@ -107,7 +108,7 @@ export const RecyclingCenterRegistry = () => {
 
   const handleApprove = async (centerId: string) => {
     try {
-      await fetch(`http://localhost:3001/api/recycling-centers/${centerId}/status`, {
+      await fetch(`${API_BASE_URL}/recycling-centers/${centerId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'active' })
@@ -120,7 +121,7 @@ export const RecyclingCenterRegistry = () => {
 
   const handleSuspend = async (centerId: string) => {
     try {
-      await fetch(`http://localhost:3001/api/recycling-centers/${centerId}/status`, {
+      await fetch(`${API_BASE_URL}/recycling-centers/${centerId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'suspended' })

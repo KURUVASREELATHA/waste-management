@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { SERVER_URL } from "@/lib/apiConfig";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -345,7 +346,7 @@ export const WasteReports = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => window.open(`http://localhost:3001/uploads/${report.image}`, '_blank')}
+                        onClick={() => window.open(`${SERVER_URL}/uploads/${report.image}`, '_blank')}
                       >
                         <Eye className="h-3 w-3 mr-1" />
                         View Photo
@@ -458,7 +459,7 @@ export const WasteReports = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => window.open(`http://localhost:3001/uploads/${report.image}`, '_blank')}
+                        onClick={() => window.open(`${SERVER_URL}/uploads/${report.image}`, '_blank')}
                       >
                         <Eye className="h-3 w-3 mr-1" />
                         View Photo

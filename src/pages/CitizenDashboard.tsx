@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { API_BASE_URL } from "@/lib/apiConfig";
 import { WasteUploadForm } from "@/components/waste/WasteUploadForm";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { VehicleMap } from "@/components/map/VehicleMap";
@@ -252,7 +253,7 @@ export const CitizenDashboard = () => {
         formData.append('image', reportImage);
       }
 
-      const response = await fetch('http://localhost:3001/api/reports', {
+      const response = await fetch(`${API_BASE_URL}/reports`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

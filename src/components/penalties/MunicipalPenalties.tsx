@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
+import { API_BASE_URL, SERVER_URL } from "@/lib/apiConfig";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -124,7 +125,7 @@ export const MunicipalPenalties = () => {
 
       // Use fetch directly for FormData to avoid JSON serialization issues
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/penalties/issue', {
+      const response = await fetch(`${API_BASE_URL}/penalties/issue`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -468,7 +469,7 @@ export const MunicipalPenalties = () => {
                               <DialogTitle>Evidence Photo</DialogTitle>
                             </DialogHeader>
                             <img 
-                              src={`http://localhost:3001/uploads/${penalty.evidenceImage}`}
+                              src={`${SERVER_URL}/uploads/${penalty.evidenceImage}`}
                               alt="Penalty evidence"
                               className="w-full h-auto rounded-lg"
                             />

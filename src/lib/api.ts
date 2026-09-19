@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:3001/api';
+import { API_BASE_URL } from './apiConfig';
+
+export { API_BASE_URL };
 
 // Add connection status tracking
 let isOnline = true;

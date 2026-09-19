@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
+import { API_BASE_URL } from '@/lib/apiConfig';
 
 export const DeleteTest = () => {
   const [testResults, setTestResults] = useState<string[]>([]);
@@ -12,7 +13,7 @@ export const DeleteTest = () => {
 
   const testConnection = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/health');
+      const response = await fetch(`${API_BASE_URL}/health`);
       const data = await response.json();
       addResult(`✅ Server connection: ${data.status}, DB: ${data.database}`);
     } catch (error) {

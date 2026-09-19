@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "@/lib/apiConfig";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +48,7 @@ export const QRScanResult = ({ qrCode, onClose }: QRScanResultProps) => {
     setError("");
     
     try {
-      const response = await fetch(`http://localhost:3001/api/qrcode/scan/${qrCode}`);
+      const response = await fetch(`${API_BASE_URL}/qrcode/scan/${qrCode}`);
       
       if (!response.ok) {
         throw new Error('QR code not found or invalid');
@@ -108,7 +109,7 @@ export const QRScanResult = ({ qrCode, onClose }: QRScanResultProps) => {
 
     setSubmittingWaste(true);
     try {
-      const response = await fetch('http://localhost:3001/api/waste', {
+      const response = await fetch(`${API_BASE_URL}/waste`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

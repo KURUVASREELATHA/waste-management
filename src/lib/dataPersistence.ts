@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './apiConfig';
+
 interface StorageData {
   [key: string]: any;
 }
@@ -149,7 +151,7 @@ class DataPersistenceService {
   private async executeSync(operation: SyncOperation): Promise<void> {
     const { type, endpoint, data } = operation;
 
-    const response = await fetch(`http://localhost:3001/api${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: type === 'CREATE' ? 'POST' : type === 'UPDATE' ? 'PATCH' : 'DELETE',
       headers: {
         'Content-Type': 'application/json',

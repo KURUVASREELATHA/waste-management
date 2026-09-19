@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
+import { SERVER_URL } from "@/lib/apiConfig";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -282,7 +283,7 @@ export const CitizenPenalties = () => {
                               <DialogTitle>Evidence Photo</DialogTitle>
                             </DialogHeader>
                             <img 
-                              src={`http://localhost:3001/uploads/${penalty.evidenceImage}`}
+                              src={`${SERVER_URL}/uploads/${penalty.evidenceImage}`}
                               alt="Penalty evidence"
                               className="w-full h-auto rounded-lg"
                             />

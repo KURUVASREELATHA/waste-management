@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SERVER_URL } from "@/lib/apiConfig";
 import { LocationTracker } from "@/components/worker/LocationTracker";
 import { VehicleMap } from "@/components/map/VehicleMap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,7 +61,7 @@ export const TestLocationTracking = () => {
               <CardTitle>Debug Info</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <p><strong>Backend URL:</strong> http://localhost:3001/api</p>
+              <p><strong>Backend URL:</strong> {SERVER_URL}/api</p>
               <p><strong>Workers Endpoint:</strong> /workers/active</p>
               <p><strong>Location Update:</strong> PATCH /workers/location</p>
               <p><strong>Status Update:</strong> PATCH /workers/status</p>

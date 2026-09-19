@@ -1,0 +1,39 @@
+# Render Blueprint — deploys the full WasteWise stack (backend API + frontend)
+# Deploy: Render Dashboard → New → Blueprint → select this repository
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # ── Backend API (Express + MongoDB Atlas) ─────────────────────────────
+  - type: web
+    name: wastewise-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI          # paste your Atlas URI when prompted (kept secret)
+        sync: false
+      - key: JWT_SECRET            # auto-generated strong secret
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: a@g
+      - key: ADMIN_PASSWORD        # set a strong admin password when prompted
+        sync: false
+
+  # ── Frontend (Vite static site) ───────────────────────────────────────
+  - type: web
+    name: wastewise-web
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL          # must match the backend service URL above
+        value: https://wastewise-api.onrender.com
+    routes:
+      - type: rewrite              # SPA support for React Router
+        source: /*
+        destination: /index.html

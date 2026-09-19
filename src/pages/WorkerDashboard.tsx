@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
+import { API_BASE_URL } from "@/lib/apiConfig";
 import { QRScanner } from "@/components/qr/QRScanner";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -393,7 +394,7 @@ export const WorkerDashboard = () => {
 
   const handleQRScan = async (result: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/qrcode/scan/${result}`);
+      const response = await fetch(`${API_BASE_URL}/qrcode/scan/${result}`);
       
       if (!response.ok) {
         throw new Error('QR code not found or invalid');

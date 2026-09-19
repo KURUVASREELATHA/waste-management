@@ -1,5 +1,6 @@
 // Data recovery utility for restoring lost dashboard data
 import { api } from './api';
+import { API_BASE_URL } from './apiConfig';
 import { dataSync } from './dataSync';
 
 export class DataRecoveryService {
@@ -71,7 +72,7 @@ export class DataRecoveryService {
       const [reports, allWaste, recyclingCenters] = await Promise.all([
         api.get('/reports/all'),
         api.get('/waste/all'),
-        fetch('http://localhost:3001/api/recycling-centers').then(res => res.json()).catch(() => [])
+        fetch(`${API_BASE_URL}/recycling-centers`).then(res => res.json()).catch(() => [])
       ]);
 
       const pendingWaste = allWaste.filter((w: any) => w.status === 'pending');
