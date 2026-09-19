@@ -5,7 +5,7 @@
 services:
   # ── Backend API (Express + MongoDB Atlas) ─────────────────────────────
   - type: web
-    name: wastewise-api
+    name: wastewise-api-sreelatha
     runtime: node
     rootDir: backend
     plan: free
@@ -26,13 +26,13 @@ services:
 
   # ── Frontend (Vite static site) ───────────────────────────────────────
   - type: web
-    name: wastewise-web
+    name: wastewise-web-sreelatha
     runtime: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL          # must match the backend service URL above
-        value: https://wastewise-api-gyla.onrender.com
+        value: https://wastewise-api-sreelatha.onrender.com
     routes:
       - type: rewrite              # SPA support for React Router
         source: /*
