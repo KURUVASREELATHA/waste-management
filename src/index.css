@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smart Waste Management Design System - All colors MUST be HSL */
+
+@layer base {
+  :root {
+    /* Environmental color palette */
+    --background: 120 20% 98%;
+    --foreground: 160 15% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 160 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 15% 15%;
+
+    /* Primary: Environmental green */
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 142 71% 85%;
+    --primary-dark: 142 71% 35%;
+
+    /* Secondary: Trust blue */
+    --secondary: 210 60% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 210 60% 85%;
+
+    /* Accent: Action orange */
+    --accent: 25 95% 60%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Status colors */
+    --success: 120 60% 50%;
+    --warning: 45 100% 60%;
+    --error: 0 70% 55%;
+    
+    --muted: 120 15% 92%;
+    --muted-foreground: 160 10% 45%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 120 15% 85%;
+    --input: 120 15% 92%;
+    --ring: 142 71% 45%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(210 60% 40%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(15 95% 55%));
+    
+    /* Shadows */
+    --shadow-primary: 0 10px 30px -5px hsl(var(--primary) / 0.3);
+    --shadow-secondary: 0 10px 30px -5px hsl(var(--secondary) / 0.3);
+    --shadow-card: 0 4px 20px -2px hsl(160 15% 15% / 0.1);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark mode colors */
+    --background: 160 15% 8%;
+    --foreground: 120 20% 95%;
+    --card: 160 15% 10%;
+    --card-foreground: 120 20% 95%;
+    --primary: 142 71% 55%;
+    --primary-foreground: 160 15% 8%;
+    --secondary: 210 60% 40%;
+    --secondary-foreground: 120 20% 95%;
+    --muted: 160 10% 15%;
+    --muted-foreground: 120 10% 65%;
+    --accent: 25 95% 55%;
+    --accent-foreground: 160 15% 8%;
+    --border: 160 10% 20%;
+    --input: 160 10% 15%;
+    --ring: 142 71% 55%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 120 20% 95%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Hero Section */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  .primary-gradient {
+    background: var(--gradient-primary);
+  }
+  
+  .secondary-gradient {
+    background: var(--gradient-secondary);
+  }
+  
+  .accent-gradient {
+    background: var(--gradient-accent);
+  }
+  
+  /* Card shadows */
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .primary-shadow {
+    box-shadow: var(--shadow-primary);
+  }
+  
+  .secondary-shadow {
+    box-shadow: var(--shadow-secondary);
+  }
+  
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+  
+  /* Status indicators */
+  .status-success {
+    @apply bg-success text-white;
+  }
+  
+  .status-warning {
+    @apply bg-warning text-white;
+  }
+  
+  .status-error {
+    @apply bg-error text-white;
+  }
+  
+  /* Beautiful glassmorphism effects */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl;
+  }
+  
+  .glass-button {
+    @apply bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all duration-300;
+  }
+  
+  /* Animated gradients */
+  .gradient-animate {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
+  
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-all duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-2xl;
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/25;
+  }
+  
+  /* Loading animations */
+  .pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .bounce-slow {
+    animation: bounce 2s infinite;
+  }
+}

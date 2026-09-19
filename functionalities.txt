@@ -1,0 +1,819 @@
+================================================================================
+                    WASTEWISE - DASHBOARD FUNCTIONALITIES
+================================================================================
+
+PROJECT OVERVIEW
+----------------
+WasteWise is a comprehensive Smart Waste Management System with four main user
+dashboards: Citizen, Municipal Worker, Recycling Center, and Admin. Each 
+dashboard has specific functionalities tailored to the user's role.
+
+================================================================================
+                        1. CITIZEN DASHBOARD FUNCTIONALITIES
+================================================================================
+
+LOCATION: /src/pages/CitizenDashboard.tsx
+
+A. PROFILE MANAGEMENT
+---------------------
+1. View Profile Information
+   - Display name, house ID, email, phone, address
+   - View municipal ID assignment
+   - View QR code for waste collection
+
+2. Edit Profile
+   - Update personal information
+   - Change contact details
+   - Update address
+
+B. WASTE MANAGEMENT
+-------------------
+3. Upload Waste
+   - Select waste type (organic, plastic, paper, metal, glass, mixed)
+   - Enter weight in kg
+   - Add location (optional)
+   - Add description (optional)
+   - Upload waste image (optional)
+   - Submit waste collection request
+
+4. View Waste History
+   - See all uploaded waste records
+   - Filter by status (pending/collected)
+   - Filter by waste type
+   - View detailed information:
+     * Waste type and weight
+     * Upload date and time
+     * Collection date and time (if collected)
+     * Location and description
+     * Waste ID for tracking
+     * Status indicators
+
+5. Generate Verification Code
+   - Create 6-digit verification code for pending waste
+   - Copy code to clipboard
+   - Share code with municipal worker for collection
+   - View code in waste history
+
+6. View Statistics
+   - Today's waste collected (kg)
+   - Total waste collected (kg)
+   - This month's collection (kg)
+   - Recycling rate percentage
+
+C. VEHICLE TRACKING
+-------------------
+7. Real-time Vehicle Tracking
+   - View municipal waste collection vehicles on map
+   - See vehicle locations in real-time
+   - Track collection routes
+   - View vehicle status
+
+D. WASTE DUMPING REPORTS
+-------------------------
+8. Report Illegal Dumping
+   - Capture current GPS location
+   - Enter location manually
+   - Add description of dumping
+   - Upload photo evidence (optional)
+   - Submit report to municipality
+
+9. View My Reports
+   - See all submitted reports
+   - View report status (pending/resolved)
+   - See resolution details
+   - View uploaded photos
+   - Check waste collected from reports
+
+E. PENALTIES MANAGEMENT
+-----------------------
+10. View Penalties
+    - See all penalties issued
+    - View penalty details and reasons
+    - Check penalty amounts
+    - View penalty status (pending/paid)
+    - See penalty dates
+
+F. ECO-SHOPPING
+---------------
+11. Browse Eco Products
+    - View eco-friendly products from recycling centers
+    - Filter by category (bags, containers, furniture, decor, stationery)
+    - See product details, prices, and images
+    - View product materials and descriptions
+
+12. Purchase Products
+    - Add products to cart
+    - Enter delivery address
+    - Add phone number
+    - Add order notes
+    - Complete purchase
+
+13. View Purchase History
+    - See all product purchases
+    - View order status (pending/confirmed/completed/cancelled)
+    - Generate verification code for order pickup
+    - Copy verification code
+    - Cancel pending orders
+    - View order details and delivery information
+
+G. DATA MANAGEMENT
+------------------
+14. Auto-refresh Dashboard
+    - Automatic data refresh every 30 seconds
+    - Manual refresh option
+    - View last update timestamp
+    - Online/offline status indicator
+
+15. Data Recovery
+    - Recover data from server if needed
+    - Fix data inconsistencies
+    - Cache management
+    - Offline data persistence
+
+================================================================================
+                    2. MUNICIPAL WORKER DASHBOARD FUNCTIONALITIES
+================================================================================
+
+LOCATION: /src/pages/WorkerDashboard.tsx
+
+A. PROFILE MANAGEMENT
+---------------------
+1. View Worker Profile
+   - Display name, worker ID, email, phone
+   - View municipal ID assignment
+   - View vehicle assignment
+   - View route assignment
+
+2. Performance Metrics
+   - View performance rating (1-5 stars)
+   - See current role assignment
+   - View achievements earned
+   - Track efficiency score
+
+B. WASTE COLLECTION
+--------------------
+3. QR Code Scanning
+   - Scan citizen QR codes
+   - Load household details automatically
+   - View citizen information
+   - Access waste history
+
+4. Manual Waste Collection
+   - Select waste type
+   - Enter weight from IoT scale
+   - Record collection details
+   - Link to citizen account
+   - Update collection status
+
+5. Verification Code Collection
+   - Enter 6-digit verification code from citizen
+   - Verify and complete waste collection
+   - Add collection notes
+   - Update waste status to collected
+
+6. View Collection History
+   - See today's collections
+   - View all collected waste
+   - Filter by date
+   - See citizen details for each collection
+   - View collection statistics
+
+C. PENDING WASTE MANAGEMENT
+----------------------------
+7. View Pending Waste
+   - See all pending waste collections
+   - Search by citizen name, address, house ID, or waste type
+   - View waste details (type, weight, location)
+   - See citizen information
+   - View upload date and time
+
+8. Complete Collections
+   - Select pending waste
+   - Enter verification code
+   - Add completion notes
+   - Mark as collected
+   - Update statistics
+
+D. WASTE REPORTS HANDLING
+--------------------------
+9. View Citizen Reports
+   - See all pending waste dumping reports
+   - View report location and description
+   - See uploaded photos
+   - Check reporter information
+
+10. Resolve Reports
+    - Upload completion proof photo
+    - Enter waste collected amount
+    - Add completion notes
+    - Mark report as resolved
+
+E. ROUTE MANAGEMENT
+--------------------
+11. View Today's Route
+    - See all houses on route
+    - View pending waste locations
+    - See report locations
+    - Search and filter locations
+    - Refresh route data
+
+12. House Management
+    - View house details
+    - See citizen information
+    - Check waste status
+    - Mark houses as collected
+
+F. VEHICLE TRACKING
+--------------------
+13. GPS Location Tracking
+    - Enable/disable GPS tracking
+    - Share real-time location
+    - Update location automatically
+    - View tracking status
+
+14. Vehicle Load Management
+    - View current load capacity
+    - See load percentage
+    - Track collections today
+    - Monitor vehicle status
+    - Check remaining capacity
+
+G. WASTE SELLING TO RECYCLERS
+------------------------------
+15. View Recycling Centers
+    - See all registered recycling centers
+    - Filter by waste type processed
+    - View center profiles
+    - Check center ratings
+
+16. Send Waste to Recyclers
+    - Select waste type
+    - Enter weight
+    - Choose recycling center
+    - Add notes
+    - Submit waste sale request
+
+17. View Sent Invitations
+    - See all sent invitations
+    - Check invitation status
+    - View recycler responses
+
+18. View Sold History
+    - See all completed waste sales
+    - View payment status
+    - Check transaction details
+    - Track revenue
+
+H. PENALTIES MANAGEMENT
+-----------------------
+19. Issue Penalties
+    - Select citizen
+    - Choose penalty type
+    - Enter amount
+    - Add reason
+    - Submit penalty
+
+20. View Issued Penalties
+    - See all penalties issued
+    - Check payment status
+    - View penalty details
+
+I. STATISTICS & REPORTING
+--------------------------
+21. Dashboard Statistics
+    - Collections today
+    - Today's waste collected (kg)
+    - Pending waste count
+    - Reports resolved
+    - Route progress
+    - Efficiency score
+    - Total collected (all-time)
+    - Monthly total
+
+================================================================================
+                3. RECYCLING CENTER DASHBOARD FUNCTIONALITIES
+================================================================================
+
+LOCATION: /src/pages/RecyclingCenterDashboard.tsx
+
+A. PROFILE MANAGEMENT
+---------------------
+1. View Center Profile
+   - Display center name, email, phone
+   - View address and location
+   - See establishment year
+   - View certification status
+   - Check specialization areas
+
+2. Performance Metrics
+   - View center rating (1-5 stars)
+   - See total reviews
+   - Check orders processed
+   - View total revenue
+   - Track products listed
+
+3. Achievements & Rewards
+   - View earned achievements
+   - See achievement progress
+   - Check reward points balance
+   - Redeem rewards
+   - View available rewards
+   - Track tier status (Gold/Silver/Bronze)
+
+B. WASTE ORDER MANAGEMENT
+--------------------------
+4. View Pending Orders
+   - See all pending waste orders from municipalities
+   - View order details (waste type, weight, sender)
+   - Check submission date
+   - See calculated payment amount
+
+5. Process Waste Orders
+   - Accept waste orders
+   - Enter accepted weight
+   - Select payment method
+   - Enter transaction ID
+   - Upload payment proof
+   - Add payment notes
+   - Complete payment
+
+6. Reject Orders
+   - Reject unwanted orders
+   - Provide rejection reason
+   - Update order status
+
+7. View Processed Orders
+   - See all completed orders
+   - View payment status
+   - Check transaction details
+   - See completion dates
+   - Track order history
+
+C. PRICING MANAGEMENT
+----------------------
+8. View Current Prices
+   - See prices for all waste types
+   - View per kg rates
+   - Check pricing structure
+
+9. Update Prices
+   - Edit price for each waste type
+   - Set custom rates
+   - Save price changes
+   - View price history
+
+D. ECO-PRODUCT MANAGEMENT
+--------------------------
+10. Add Products
+    - Enter product name
+    - Add description
+    - Set price
+    - Choose category
+    - Upload product image
+    - Set stock quantity
+    - Specify materials used
+
+11. Edit Products
+    - Update product details
+    - Change price
+    - Modify stock
+    - Update images
+    - Edit description
+
+12. Delete Products
+    - Remove products from listing
+    - Confirm deletion
+    - Update inventory
+
+13. View Products
+    - See all listed products
+    - Filter by category
+    - View product details
+    - Check stock levels
+    - See product images
+
+E. SALES MANAGEMENT
+--------------------
+14. View Sales History
+    - See all product orders
+    - Filter by status (pending/confirmed/completed/cancelled)
+    - View buyer information
+    - Check order details
+    - See delivery addresses
+
+15. Confirm Orders
+    - Accept pending orders
+    - Update order status
+    - Notify customers
+
+16. Complete Orders
+    - Enter customer verification code
+    - Verify and complete order
+    - Update order status
+    - Process payment
+
+17. Cancel Orders
+    - Cancel orders if needed
+    - Restore product stock
+    - Notify customers
+    - Update order status
+
+F. STATISTICS & REPORTING
+--------------------------
+18. Dashboard Statistics
+    - Pending orders count
+    - Today's revenue
+    - Total revenue
+    - Product sales (monthly)
+    - Product sales (total)
+    - Orders processed
+    - Active connections
+
+G. CONNECTION MANAGEMENT
+-------------------------
+19. View Connections
+    - See connected municipalities
+    - View connection status
+    - Check partnership details
+
+================================================================================
+                        4. ADMIN DASHBOARD FUNCTIONALITIES
+================================================================================
+
+LOCATION: /src/pages/AdminDashboard.tsx
+
+A. SYSTEM OVERVIEW
+------------------
+1. View System Statistics
+   - Total citizens registered
+   - Total municipal workers
+   - Total recycling centers
+   - Today's waste collected
+   - Pending reports
+   - Total waste collected (all-time)
+   - Monthly waste total
+
+2. Refresh Dashboard
+   - Manual data refresh
+   - Clear cache
+   - Update statistics
+   - View last update time
+
+B. USER MANAGEMENT
+------------------
+3. Manage Citizens
+   - View all registered citizens
+   - See citizen details (name, house ID, email, phone)
+   - View citizen profiles
+   - Check waste collection history
+   - Access citizen statistics
+
+4. Manage Workers
+   - View all municipal workers
+   - See worker details (name, worker ID, email, phone)
+   - View worker profiles
+   - Check collection activity
+   - Monitor worker performance
+
+5. Manage Recycling Centers
+   - View all recycling centers
+   - See center details (name, center name, email, phone)
+   - View center profiles
+   - Check processing activity
+   - Monitor center performance
+
+6. View User Details
+   - Open detailed user profiles
+   - View complete user information
+   - Check activity history
+   - See user statistics
+   - Access user data
+
+C. LIVE TRACKING
+-----------------
+7. Vehicle Tracking
+   - View all municipal vehicles on map
+   - Track real-time locations
+   - Monitor vehicle status
+   - See collection routes
+   - Check vehicle assignments
+
+D. RECYCLER MANAGEMENT
+-----------------------
+8. Manage Achievements
+   - View all achievements
+   - Add new achievements
+   - Edit achievement details
+   - Delete achievements
+   - Set achievement thresholds
+   - Assign achievements to recyclers
+
+9. Manage Rewards
+   - View all rewards
+   - Add new rewards
+   - Edit reward details
+   - Delete rewards
+   - Set reward points
+   - Manage reward redemption
+
+10. Manage Ratings
+    - View recycler ratings
+    - Update ratings (1-5 stars)
+    - Assign ratings to recyclers
+    - Track rating history
+
+11. Manage Reward Points
+    - View recycler points balance
+    - Update points
+    - Add/subtract points
+    - Track points history
+
+E. STATISTICS & ANALYTICS
+--------------------------
+12. Area-wise Collection Status
+    - View collected areas
+    - See pending areas
+    - Check collection progress
+    - Monitor completion rate
+
+13. System Performance
+    - View system uptime
+    - Check active users
+    - Monitor response time
+    - Track data accuracy
+
+14. Recycling Statistics
+    - Total recycled materials
+    - Active recycling centers
+    - Monthly revenue from recycling
+    - Processing statistics
+
+F. REPORTS & MONITORING
+------------------------
+15. View All Reports
+    - See citizen waste dumping reports
+    - Check report status
+    - Monitor resolution progress
+    - View report details
+
+================================================================================
+                            COMMON FUNCTIONALITIES
+================================================================================
+
+ALL DASHBOARDS INCLUDE:
+-----------------------
+1. Authentication
+   - Secure login
+   - JWT token-based authentication
+   - Session management
+   - Auto-logout on token expiry
+
+2. Navigation
+   - Tab-based navigation
+   - Responsive design
+   - Mobile-friendly interface
+   - Breadcrumb navigation
+
+3. Notifications
+   - Toast notifications for actions
+   - Success/error messages
+   - Real-time updates
+   - Alert notifications
+
+4. Data Management
+   - Auto-save functionality
+   - Local storage caching
+   - Data synchronization
+   - Offline support
+
+5. Search & Filter
+   - Search functionality
+   - Filter options
+   - Sort capabilities
+   - Advanced filtering
+
+6. Responsive Design
+   - Mobile responsive
+   - Tablet optimized
+   - Desktop layout
+   - Cross-browser compatible
+
+7. Real-time Updates
+   - Auto-refresh data
+   - Live status updates
+   - Real-time notifications
+   - WebSocket support (planned)
+
+8. Data Visualization
+   - Charts and graphs
+   - Statistics cards
+   - Progress bars
+   - Visual indicators
+
+9. Export & Reports
+   - Export data (planned)
+   - Generate reports (planned)
+   - Print functionality (planned)
+   - PDF generation (planned)
+
+================================================================================
+                            SPECIAL FEATURES
+================================================================================
+
+1. QR CODE SYSTEM
+-----------------
+- Generate QR codes for citizens
+- Scan QR codes for waste collection
+- Link waste to citizen accounts
+- Verify collections with QR codes
+
+2. VERIFICATION CODE SYSTEM
+----------------------------
+- 6-digit verification codes
+- Secure waste collection verification
+- Product order verification
+- Code generation and validation
+
+3. GPS TRACKING
+---------------
+- Real-time vehicle tracking
+- Location-based services
+- Route optimization
+- Geofencing (planned)
+
+4. IMAGE UPLOAD
+---------------
+- Waste images
+- Report evidence photos
+- Product images
+- Payment proof uploads
+
+5. PAYMENT SYSTEM
+-----------------
+- Multiple payment methods
+- Transaction tracking
+- Payment proof upload
+- Revenue tracking
+
+6. PENALTY SYSTEM
+-----------------
+- Issue penalties to citizens
+- Track penalty status
+- Payment management
+- Penalty history
+
+7. ECO-SHOPPING MARKETPLACE
+----------------------------
+- Product listing
+- Shopping cart
+- Order management
+- Verification-based delivery
+
+8. WASTE SELLING SYSTEM
+------------------------
+- Municipality to recycler waste sales
+- Invitation system
+- Price negotiation
+- Payment tracking
+
+9. ACHIEVEMENTS & REWARDS
+--------------------------
+- Gamification for recyclers
+- Achievement tracking
+- Reward points system
+- Tier-based benefits
+
+10. DATA PERSISTENCE
+--------------------
+- Local storage backup
+- Cache management
+- Data recovery
+- Offline functionality
+
+================================================================================
+                            API ENDPOINTS USED
+================================================================================
+
+AUTHENTICATION
+--------------
+- POST /api/auth/register
+- POST /api/auth/login
+- GET /api/auth/users/role/:role
+- GET /api/auth/citizens
+
+WASTE MANAGEMENT
+----------------
+- POST /api/waste
+- GET /api/waste/history
+- GET /api/waste/history/:userId
+- GET /api/waste/stats
+- GET /api/waste/all
+- GET /api/waste/dashboard-stats
+- PATCH /api/waste/:id/generate-code
+- PATCH /api/waste/:id/complete-collection
+- DELETE /api/waste/:id
+
+REPORTS
+-------
+- POST /api/reports
+- GET /api/reports/my-reports
+- GET /api/reports/all
+- PATCH /api/reports/:id/status
+
+PENALTIES
+---------
+- POST /api/penalties
+- GET /api/penalties/citizen
+- GET /api/penalties/municipality
+
+PRODUCTS
+--------
+- POST /api/products
+- GET /api/products/my
+- GET /api/products/all
+- PATCH /api/products/:id
+- DELETE /api/products/:id
+
+PURCHASES
+---------
+- POST /api/products/purchase
+- GET /api/products/purchases/my
+- GET /api/products/purchases/sales
+- PATCH /api/products/purchases/:id/generate-code
+- PATCH /api/products/purchases/:id/status
+- PATCH /api/products/purchases/:id/verify-complete
+- PATCH /api/products/purchases/:id/cancel
+- PATCH /api/products/purchases/:id/cancel-by-seller
+
+WASTE SALES
+-----------
+- POST /api/waste-sales
+- GET /api/waste-sales
+- PATCH /api/waste-sales/:id/payment
+- PATCH /api/waste-sales/:id/status
+
+RECYCLING
+---------
+- GET /api/recycling/connections
+- GET /api/recycling/prices
+- PATCH /api/recycling/prices
+
+INVITATIONS
+-----------
+- POST /api/invitations
+- GET /api/invitations/sent
+- GET /api/invitations/received
+
+WORKERS
+-------
+- PATCH /api/workers/status
+
+QR CODES
+--------
+- GET /api/qrcode/scan/:code
+
+================================================================================
+                            TECHNOLOGY STACK
+================================================================================
+
+FRONTEND
+--------
+- React 18.3.1
+- TypeScript 5.8.3
+- Vite 5.4.19
+- Tailwind CSS 3.4.17
+- shadcn-ui (Radix UI)
+- React Router DOM 6.30.1
+- TanStack React Query 5.83.0
+- Leaflet 1.9.4 (Maps)
+- QRCode libraries
+- Recharts 2.15.4 (Charts)
+
+BACKEND
+-------
+- Node.js
+- Express.js 4.18.2
+- MongoDB
+- Mongoose 8.0.0
+- JWT (jsonwebtoken 9.0.2)
+- bcryptjs 2.4.3
+- Multer 1.4.5 (File uploads)
+
+================================================================================
+                            FUTURE ENHANCEMENTS
+================================================================================
+
+1. Real-time notifications with WebSocket
+2. Advanced analytics and reporting
+3. Mobile app development
+4. AI-powered waste classification
+5. Blockchain for transparency
+6. IoT integration for smart bins
+7. Route optimization algorithms
+8. Predictive analytics
+9. Multi-language support
+10. Advanced payment gateway integration
+
+================================================================================
+                                END OF DOCUMENT
+================================================================================
