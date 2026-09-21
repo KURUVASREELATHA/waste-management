@@ -32,7 +32,7 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL          # must match the backend service URL above
-        value: https://wastewise-api-sreelatha.onrender.com
+        value: https://wastewise-api-sreelatha-dcw6.onrender.com
     routes:
       - type: rewrite              # SPA support for React Router
         source: /*
