@@ -123,8 +123,6 @@ export const AdminDashboard = () => {
           wasteCollectedToday: statsResponse.wasteCollectedToday || 0,
           pendingReports: statsResponse.pendingCollections || 0,
           collectionRate: statsResponse.collectionRate || 0,
-          activeVehicles: Math.max(0, Math.ceil((statsResponse.wasteCollectedToday || 0) / 100)),
-          recyclingCenters: (statsResponse.wasteCollectedToday || 0) > 0 ? Math.max(1, Math.ceil((statsResponse.wasteCollectedToday || 0) / 50)) : 0,
           totalCollected: statsResponse.totalCollected || 0,
           monthlyTotal: statsResponse.monthlyTotal || 0,
           lastUpdated: new Date().toISOString()
@@ -166,8 +164,8 @@ export const AdminDashboard = () => {
         setCitizenReports([]);
         setAdminData(prev => ({ 
           ...prev, 
-          pendingReports: 1,
-          resolvedReports: 15
+          pendingReports: 0,
+          resolvedReports: 0
         }));
       }
     };
@@ -316,8 +314,6 @@ export const AdminDashboard = () => {
                     wasteCollectedToday: statsResponse.wasteCollectedToday || 0,
                     pendingReports: statsResponse.pendingCollections || 0,
                     collectionRate: statsResponse.collectionRate || 0,
-                    activeVehicles: Math.max(0, Math.ceil((statsResponse.wasteCollectedToday || 0) / 100)),
-                    recyclingCenters: (statsResponse.wasteCollectedToday || 0) > 0 ? Math.max(1, Math.ceil((statsResponse.wasteCollectedToday || 0) / 50)) : 0,
                     totalCollected: statsResponse.totalCollected || 0,
                     monthlyTotal: statsResponse.monthlyTotal || 0,
                     lastUpdated: new Date().toISOString()
@@ -601,31 +597,31 @@ export const AdminDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* System Performance */}
+            {/* Reports Overview */}
             <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl">
               <CardHeader className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-t-2xl">
                 <CardTitle className="flex items-center space-x-2 text-white">
-                  <BarChart3 className="h-6 w-6 text-purple-400" />
-                  <span className="text-xl font-bold">System Performance</span>
+                  <Camera className="h-6 w-6 text-purple-400" />
+                  <span className="text-xl font-bold">Citizen Reports</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6 p-6">
                 <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-red-500/20 rounded-xl">
+                    <div className="text-3xl font-bold text-red-300">{adminData.pendingReports}</div>
+                    <div className="text-sm text-red-200">Pending Reports</div>
+                  </div>
                   <div className="text-center p-4 bg-green-500/20 rounded-xl">
-                    <div className="text-3xl font-bold text-green-300">{adminData.collectionRate > 0 ? '99.8%' : '0%'}</div>
-                    <div className="text-sm text-green-200">System Uptime</div>
+                    <div className="text-3xl font-bold text-green-300">{adminData.resolvedReports}</div>
+                    <div className="text-sm text-green-200">Resolved Reports</div>
                   </div>
                   <div className="text-center p-4 bg-blue-500/20 rounded-xl">
                     <div className="text-3xl font-bold text-blue-300">{userCounts.citizens + userCounts.workers + userCounts.recyclers}</div>
                     <div className="text-sm text-blue-200">Active Users</div>
                   </div>
                   <div className="text-center p-4 bg-purple-500/20 rounded-xl">
-                    <div className="text-3xl font-bold text-purple-300">{adminData.wasteCollectedToday > 0 ? '120ms' : '0ms'}</div>
-                    <div className="text-sm text-purple-200">Avg Response</div>
-                  </div>
-                  <div className="text-center p-4 bg-orange-500/20 rounded-xl">
-                    <div className="text-3xl font-bold text-orange-300">{adminData.totalCollected > 0 ? '95.2%' : '0%'}</div>
-                    <div className="text-sm text-orange-200">Data Accuracy</div>
+                    <div className="text-3xl font-bold text-purple-300">{citizenReports.length}</div>
+                    <div className="text-sm text-purple-200">Total Reports</div>
                   </div>
                 </div>
               </CardContent>
@@ -649,9 +645,8 @@ export const AdminDashboard = () => {
               ) : (
                 <div className="space-y-6">
                   {recyclers.map((recycler) => {
-                    const userSeed = recycler._id ? parseInt(recycler._id.slice(-2), 16) || 1 : 1;
-                    const currentRating = parseInt(localStorage.getItem(`recycler_${recycler._id}_rating`) || (3 + (userSeed % 3)).toString());
-                    const currentPoints = parseInt(localStorage.getItem(`recycler_${recycler._id}_points`) || (1000 + (userSeed * 50)).toString());
+                    const currentRating = parseInt(localStorage.getItem(`recycler_${recycler._id}_rating`) || '0');
+                    const currentPoints = parseInt(localStorage.getItem(`recycler_${recycler._id}_points`) || '0');
                     
                     return (
                       <div key={recycler._id} className="p-6 bg-muted/30 rounded-lg space-y-4">
@@ -666,12 +661,12 @@ export const AdminDashboard = () => {
                                 <span key={star} className={`text-lg cursor-pointer ${star <= currentRating ? 'text-yellow-400' : 'text-gray-300'}`}
                                   onClick={() => {
                                     localStorage.setItem(`recycler_${recycler._id}_rating`, star.toString());
-                                    window.location.reload();
+                                    setDataVersion(v => v + 1);
                                   }}
                                 >★</span>
                               ))}
                             </div>
-                            <p className="text-sm text-muted-foreground">{currentRating}/5 rating</p>
+                            <p className="text-sm text-muted-foreground">{currentRating > 0 ? `${currentRating}/5 rating` : 'Not rated yet'}</p>
                           </div>
                         </div>
                         
@@ -694,7 +689,7 @@ export const AdminDashboard = () => {
                               </div>
                               <div className="grid grid-cols-2 gap-3">
                                 {achievements.map((achievement) => {
-                                  const earned = achievement.id === 'quality_master' ? currentRating >= 4 : userSeed > achievement.threshold;
+                                  const earned = localStorage.getItem(`recycler_${recycler._id}_achievement_${achievement.id}`) === 'true';
                                   return (
                                     <div key={achievement.id} className={`p-2 rounded border-2 cursor-pointer relative group ${
                                       earned ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
@@ -703,7 +698,7 @@ export const AdminDashboard = () => {
                                         const key = `recycler_${recycler._id}_achievement_${achievement.id}`;
                                         const current = localStorage.getItem(key) === 'true';
                                         localStorage.setItem(key, (!current).toString());
-                                        window.location.reload();
+                                        setDataVersion(v => v + 1);
                                       }}
                                     >
                                       <Button size="sm" variant="ghost" className="absolute top-0 right-0 h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
@@ -772,7 +767,10 @@ export const AdminDashboard = () => {
                                     Add Reward
                                   </Button>
                                 </div>
-                                {rewards.map((reward) => (
+                                {rewards.map((reward) => {
+                                  const claimKey = `recycler_${recycler._id}_reward_${reward.id}_claimed`;
+                                  const claimed = localStorage.getItem(claimKey) === 'true';
+                                  return (
                                   <div key={reward.id} className="flex items-center justify-between p-2 bg-muted/30 rounded text-xs group">
                                     <div className="flex-1">
                                       <span>{reward.title}</span>
@@ -788,10 +786,32 @@ export const AdminDashboard = () => {
                                       >
                                         ✏️
                                       </Button>
-                                      <Button size="sm" variant="outline" className="h-6 px-2 text-xs">Claim</Button>
+                                      <Button size="sm" variant="outline" className="h-6 px-2 text-xs"
+                                        disabled={claimed}
+                                        onClick={() => {
+                                          if (currentPoints < reward.points) {
+                                            toast({
+                                              title: "Cannot Claim",
+                                              description: `Not enough points. ${recycler.name} has ${currentPoints} pts, needs ${reward.points} pts.`,
+                                              variant: "destructive"
+                                            });
+                                            return;
+                                          }
+                                          localStorage.setItem(claimKey, 'true');
+                                          localStorage.setItem(`recycler_${recycler._id}_points`, (currentPoints - reward.points).toString());
+                                          setDataVersion(v => v + 1);
+                                          toast({
+                                            title: "Reward Claimed",
+                                            description: `${reward.title} claimed for ${recycler.name}. ${reward.points} points deducted.`
+                                          });
+                                        }}
+                                      >
+                                        {claimed ? 'Claimed ✓' : 'Claim'}
+                                      </Button>
                                     </div>
                                   </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                               
                               <div className="p-3 bg-blue-50 rounded">
@@ -803,12 +823,12 @@ export const AdminDashboard = () => {
                                         type="number" 
                                         value={currentPoints} 
                                         onChange={(e) => {
-                                          localStorage.setItem(`recycler_${recycler._id}_points`, e.target.value);
+                                          localStorage.setItem(`recycler_${recycler._id}_points`, e.target.value || '0');
                                         }}
                                         className="h-6 w-20 text-xs"
                                       />
                                       <Button size="sm" variant="outline" className="h-6 px-2 text-xs"
-                                        onClick={() => window.location.reload()}
+                                        onClick={() => setDataVersion(v => v + 1)}
                                       >
                                         Update
                                       </Button>
@@ -816,7 +836,19 @@ export const AdminDashboard = () => {
                                   </div>
                                   <div className="text-right">
                                     <p className="text-xl font-bold text-blue-600">{currentPoints.toLocaleString()}</p>
-                                    <Button size="sm" className="h-6 px-2 text-xs">Redeem</Button>
+                                    <Button size="sm" className="h-6 px-2 text-xs"
+                                      disabled={currentPoints <= 0}
+                                      onClick={() => {
+                                        if (confirm(`Redeem all ${currentPoints} points for ${recycler.name}? Points will reset to 0.`)) {
+                                          localStorage.setItem(`recycler_${recycler._id}_points`, '0');
+                                          setDataVersion(v => v + 1);
+                                          toast({
+                                            title: "Points Redeemed",
+                                            description: `${currentPoints} points redeemed for ${recycler.name}.`
+                                          });
+                                        }
+                                      }}
+                                    >Redeem</Button>
                                   </div>
                                 </div>
                               </div>
@@ -836,11 +868,11 @@ export const AdminDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl">
               <CardHeader className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-t-2xl">
-                <CardTitle className="text-white text-xl font-bold">Total Recycled</CardTitle>
+                <CardTitle className="text-white text-xl font-bold">Total Collected</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-4xl font-bold text-green-300">{Math.floor(adminData.totalCollected * 0.7)} kg</div>
-                <p className="text-sm text-green-200">Materials processed</p>
+                <div className="text-4xl font-bold text-green-300">{adminData.totalCollected} kg</div>
+                <p className="text-sm text-green-200">Waste collected all-time</p>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl">
@@ -849,16 +881,16 @@ export const AdminDashboard = () => {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="text-4xl font-bold text-blue-300">{userCounts.recyclers}</div>
-                <p className="text-sm text-blue-200">Currently operating</p>
+                <p className="text-sm text-blue-200">Registered recycling centers</p>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl">
               <CardHeader className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-t-2xl">
-                <CardTitle className="text-white text-xl font-bold">Monthly Revenue</CardTitle>
+                <CardTitle className="text-white text-xl font-bold">Monthly Collection</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-4xl font-bold text-purple-300">₹{Math.floor(adminData.monthlyTotal * 15).toLocaleString()}</div>
-                <p className="text-sm text-purple-200">From recycling sales</p>
+                <div className="text-4xl font-bold text-purple-300">{adminData.monthlyTotal} kg</div>
+                <p className="text-sm text-purple-200">Collected this month</p>
               </CardContent>
             </Card>
           </div>

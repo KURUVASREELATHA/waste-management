@@ -75,10 +75,6 @@ export const RecyclingCenterDashboard = () => {
     productSalesTotal: 0,
     productSalesMonthly: 0
   });
-  const [processedOrderIds, setProcessedOrderIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem(`processedOrders_${user?.id}`);
-    return saved ? JSON.parse(saved) : [];
-  });
   const [salesHistory, setSalesHistory] = useState<any[]>([]);
   const [filteredSales, setFilteredSales] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -121,16 +117,15 @@ export const RecyclingCenterDashboard = () => {
         productSalesMonthly: monthlyProductRevenue
       }));
     } catch (error) {
-      console.error('Sales fetch error:', error);
-      // Set fallback data if API fails
+      console.error('Failed to fetch sales:', error);
       setSalesHistory([]);
       setFilteredSales([]);
       
-      // Set default product sales stats
+      // No fake fallback data - keep real values only
       setStats(prev => ({
         ...prev,
-        productSalesTotal: 400,
-        productSalesMonthly: 400
+        productSalesTotal: 0,
+        productSalesMonthly: 0
       }));
     }
   };
@@ -330,28 +325,13 @@ export const RecyclingCenterDashboard = () => {
 
   const fetchOrders = async () => {
     try {
-      // Get all waste sales where this recycler is the recipient
-      const allSales = await api.get('/waste/debug/sales');
-      const userStr = localStorage.getItem('user');
-      const user = userStr ? JSON.parse(userStr) : null;
-      
-      console.log('All sales:', allSales);
-      console.log('Current user:', user);
-      
-      // Since recyclerId is null in the data, show all orders for now
-      // In a real system, this would be properly filtered
-      const orders = allSales || [];
-      
-      console.log('Showing all orders (recyclerId filtering disabled):', orders);
-
+      // Get only the waste orders addressed to THIS recycling center (filtered by logged-in recycler)
+      const orders = await api.get('/waste/orders/recycler');
       
       const pending = orders.filter((order: any) => order.status === 'pending');
       const processed = orders.filter((order: any) => 
         order.status === 'accepted' || order.status === 'completed' || order.status === 'cancelled' || order.status === 'rejected'
       );
-      
-      console.log('Pending orders:', pending);
-      console.log('Processed orders:', processed);
       
       setPendingOrders(pending);
       setProcessedOrders(processed);
@@ -440,35 +420,15 @@ export const RecyclingCenterDashboard = () => {
     }
 
     try {
-      // Update the order in database
+      // Update the order in database (status -> completed, payment -> paid)
       await api.patch(`/waste-sales/${selectedOrder._id}/payment`, {
         verificationCode: selectedOrder.verificationCode,
         transactionId: paymentData.transactionId,
         paymentNotes: paymentData.notes
       });
       
-      // Mark order as processed locally
-      const newProcessedIds = [...processedOrderIds, selectedOrder._id];
-      const orderRevenue = paymentData.acceptedWeight * WASTE_PRICES[selectedOrder.wasteType];
-      
-      setProcessedOrderIds(newProcessedIds);
-      localStorage.setItem(`processedOrders_${user?.id}`, JSON.stringify(newProcessedIds));
-      setPendingOrders(prev => prev.filter(order => order._id !== selectedOrder._id));
-      setProcessedOrders(prev => [...prev, {
-        ...selectedOrder,
-        status: 'completed',
-        paymentStatus: 'paid',
-        processedAt: new Date(),
-        acceptedWeight: paymentData.acceptedWeight,
-        totalAmount: orderRevenue
-      }]);
-      setStats(prev => ({
-        ...prev,
-        pendingCount: prev.pendingCount - 1,
-        totalProcessed: prev.totalProcessed + 1,
-        totalRevenue: prev.totalRevenue + orderRevenue,
-        todayRevenue: prev.todayRevenue + orderRevenue
-      }));
+      // Refetch real data from the server
+      fetchOrders();
       
       toast({
         title: "Order Processed",
@@ -586,27 +546,6 @@ export const RecyclingCenterDashboard = () => {
                   <div>
                     <h3 className="text-xl font-bold">{user?.centerName || user?.name}</h3>
                     <p className="text-muted-foreground">{user?.email}</p>
-                    <div className="flex items-center space-x-2 mt-2">
-                      <div className="flex items-center">
-                        {[1,2,3,4,5].map((star) => {
-                          const userSeed = user?.id ? parseInt(user.id.slice(-2), 16) || 1 : 1;
-                          const defaultRating = Math.min(5, Math.max(3, 3 + (userSeed % 3)));
-                          const adminRating = parseInt(localStorage.getItem(`recycler_${user?.id}_rating`) || defaultRating.toString());
-                          return (
-                            <span key={star} className={`text-lg ${star <= adminRating ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
-                          );
-                        })}
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        {(() => {
-                          const userSeed = user?.id ? parseInt(user.id.slice(-2), 16) || 1 : 1;
-                          const defaultRating = 3 + (userSeed % 3);
-                          const adminRating = parseInt(localStorage.getItem(`recycler_${user?.id}_rating`) || defaultRating.toString());
-                          return adminRating.toFixed(1);
-                        })()}/5 
-                        ({user?.id ? (50 + (parseInt(user.id.slice(-2), 16) % 100)) : 127} reviews)
-                      </span>
-                    </div>
                   </div>
                 </div>
                 
@@ -622,29 +561,6 @@ export const RecyclingCenterDashboard = () => {
                   <div>
                     <Label className="text-sm text-muted-foreground">Established</Label>
                     <p className="font-medium">{user?.createdAt ? new Date(user.createdAt).getFullYear() : 'N/A'}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm text-muted-foreground">Certification</Label>
-                    <p className="font-medium text-green-600">
-                      {user?.id && parseInt(user.id.slice(-1), 16) % 2 === 0 ? 'ISO 14001 Certified' : 'Green Business Certified'}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-sm text-muted-foreground">Specialization</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {(() => {
-                      const allSpecs = ['Plastic Recycling', 'Paper Processing', 'Metal Recovery', 'Organic Composting', 'E-Waste Processing', 'Glass Recovery'];
-                      const userSeed = user?.id ? parseInt(user.id.slice(-2), 16) || 1 : 1;
-                      const numSpecs = 2 + (userSeed % 3);
-                      const startIndex = userSeed % (allSpecs.length - numSpecs + 1);
-                      return allSpecs.slice(startIndex, startIndex + numSpecs);
-                    })().map((spec) => (
-                      <span key={spec} className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                        {spec}
-                      </span>
-                    ))}
                   </div>
                 </div>
               </CardContent>
@@ -681,17 +597,14 @@ export const RecyclingCenterDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
-                  {(() => {
-                    const userSeed = user?.id ? parseInt(user.id.slice(-2), 16) || 1 : 1;
-                    return [
-                      { title: 'Eco Champion', desc: 'Processed 1000+ kg waste', icon: '🏆', earned: userSeed > 50 },
-                      { title: 'Green Pioneer', desc: 'First 100 orders completed', icon: '🌱', earned: userSeed > 30 },
-                      { title: 'Quality Master', desc: 'Maintain 4+ star rating', icon: '⭐', earned: userSeed > 40 },
-                      { title: 'Innovation Leader', desc: 'Launch 50+ eco products', icon: '💡', earned: userSeed > 70 },
-                      { title: 'Community Hero', desc: 'Serve 10+ municipalities', icon: '🤝', earned: userSeed > 80 },
-                      { title: 'Sustainability Expert', desc: 'Zero waste to landfill', icon: '♻️', earned: userSeed > 90 }
-                    ];
-                  })().map((achievement) => (
+                  {[
+                    { title: 'Eco Champion', desc: 'Process 50+ waste orders', icon: '🏆', earned: stats.totalProcessed >= 50 },
+                    { title: 'Green Pioneer', desc: 'Complete first 10 orders', icon: '🌱', earned: stats.totalProcessed >= 10 },
+                    { title: 'Quality Master', desc: 'Complete first order', icon: '⭐', earned: stats.totalProcessed >= 1 },
+                    { title: 'Innovation Leader', desc: 'List 10+ eco products', icon: '💡', earned: products.length >= 10 },
+                    { title: 'Community Hero', desc: 'List first eco product', icon: '🤝', earned: products.length >= 1 },
+                    { title: 'Revenue Star', desc: 'Earn ₹10,000+ revenue', icon: '💰', earned: stats.totalRevenue >= 10000 }
+                  ].map((achievement) => (
                     <div key={achievement.title} className={`p-3 rounded-lg border-2 ${achievement.earned ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                       <div className="text-2xl mb-2">{achievement.icon}</div>
                       <h4 className={`font-medium text-sm ${achievement.earned ? 'text-green-800' : 'text-gray-500'}`}>
@@ -715,70 +628,35 @@ export const RecyclingCenterDashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <DollarSign className="h-5 w-5" />
-                  <span>Rewards & Benefits</span>
+                  <span>Business Summary</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-yellow-800">Gold Tier Status</h4>
-                    <span className="text-2xl">🥇</span>
-                  </div>
-                  <p className="text-sm text-yellow-700 mb-3">Premium benefits unlocked!</p>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>5% bonus on all transactions</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Priority order processing</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Free marketing support</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-medium">Available Rewards</h4>
-                  {[
-                    { title: 'Carbon Credit Bonus', points: '500 pts', desc: 'Earn extra for eco-friendly practices' },
-                    { title: 'Bulk Processing Bonus', points: '300 pts', desc: 'Handle large municipal orders' },
-                    { title: 'Quality Excellence', points: '200 pts', desc: 'Maintain high processing standards' },
-                    { title: 'Innovation Bonus', points: '400 pts', desc: 'Launch new recycling methods' }
-                  ].map((reward) => (
-                    <div key={reward.title} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">{reward.title}</p>
-                        <p className="text-xs text-muted-foreground">{reward.desc}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-green-600">{reward.points}</p>
-                        <Button size="sm" variant="outline">Claim</Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="p-3 bg-blue-50 rounded-lg">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-blue-800">Total Reward Points</p>
-                      <p className="text-sm text-blue-600">Redeem for cash or benefits</p>
+                      <p className="font-medium text-blue-800">Waste Purchase Spend</p>
+                      <p className="text-sm text-blue-600">Paid to waste sellers</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-blue-600">
-                        {(() => {
-                          const userSeed = user?.id ? parseInt(user.id.slice(-2), 16) || 1 : 1;
-                          const defaultPoints = 1000 + (userSeed * 50);
-                          const adminPoints = parseInt(localStorage.getItem(`recycler_${user?.id}_points`) || defaultPoints.toString());
-                          return adminPoints.toLocaleString();
-                        })()}
-                      </p>
-                      <Button size="sm">Redeem</Button>
+                    <p className="text-2xl font-bold text-blue-600">₹{stats.totalRevenue.toLocaleString()}</p>
+                  </div>
+                </div>
+                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-purple-800">Product Sales Revenue</p>
+                      <p className="text-sm text-purple-600">From eco product orders</p>
                     </div>
+                    <p className="text-2xl font-bold text-purple-600">₹{stats.productSalesTotal.toLocaleString()}</p>
+                  </div>
+                </div>
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-green-800">Pending Orders</p>
+                      <p className="text-sm text-green-600">Awaiting processing</p>
+                    </div>
+                    <p className="text-2xl font-bold text-green-600">{stats.pendingCount}</p>
                   </div>
                 </div>
               </CardContent>
@@ -805,7 +683,7 @@ export const RecyclingCenterDashboard = () => {
               ) : (
                 <div className="space-y-4">
                   {pendingOrders.map((order) => (
-                    <OrderCard key={order._id} order={order} onProcess={openPaymentModal} wastePrices={WASTE_PRICES} />
+                    <OrderCard key={order._id} order={order} onProcess={openPaymentModal} wastePrices={WASTE_PRICES} onReject={fetchOrders} />
                   ))}
                 </div>
               )}
@@ -1407,7 +1285,8 @@ const PriceCard = ({ type, price, onUpdate }: { type: string; price: number; onU
   );
 };
 
-const OrderCard = ({ order, onProcess, wastePrices }: { order: any; onProcess: (order: any, weight: number) => void; wastePrices: any }) => {
+const OrderCard = ({ order, onProcess, wastePrices, onReject }: { order: any; onProcess: (order: any, weight: number) => void; wastePrices: any; onReject: () => void }) => {
+  const [rejecting, setRejecting] = useState(false);
   const wastePrice = wastePrices[order.wasteType] || 0;
   const totalAmount = order.weight * wastePrice;
 
@@ -1416,7 +1295,7 @@ const OrderCard = ({ order, onProcess, wastePrices }: { order: any; onProcess: (
       <div className="flex justify-between items-start">
         <div>
           <p className="font-medium">{order.wasteType} Waste</p>
-          <p className="text-sm text-muted-foreground">From: {order.municipalId?.name || 'Municipal Worker'}</p>
+          <p className="text-sm text-muted-foreground">From: {order.sellerId?.name || 'Municipal Worker'}</p>
           <p className="text-sm text-muted-foreground">Requested: {order.weight}kg</p>
           <p className="text-sm text-muted-foreground">
             Submitted: {new Date(order.createdAt).toLocaleString()}
@@ -1450,18 +1329,21 @@ const OrderCard = ({ order, onProcess, wastePrices }: { order: any; onProcess: (
         </Button>
         <Button
           variant="destructive"
+          disabled={rejecting}
           onClick={async () => {
             if (confirm('Are you sure you want to reject this order?')) {
               try {
+                setRejecting(true);
                 await api.patch(`/waste-sales/${order._id}/status`, { status: 'rejected' });
-                window.location.reload();
+                onReject();
               } catch (error) {
                 console.error('Failed to reject order:', error);
+                setRejecting(false);
               }
             }
           }}
         >
-          Reject
+          {rejecting ? 'Rejecting...' : 'Reject'}
         </Button>
       </div>
     </div>

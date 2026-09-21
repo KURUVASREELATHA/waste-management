@@ -4,6 +4,7 @@ import Waste from '../models/Waste.js';
 import Report from '../models/Report.js';
 import WasteSale from '../models/WasteSale.js';
 import auth from '../middleware/auth.js';
+import { hydrateSales } from '../utils/hydrateSale.js';
 
 // Generate unique verification code
 const generateVerificationCode = () => {
@@ -996,11 +997,8 @@ router.get('/orders/recycler', auth, async (req, res) => {
   try {
     const orders = await WasteSale.find({ 
       recyclerId: req.userId
-    })
-      .populate('sellerId', 'name email phone role')
-      .populate('recyclerId', 'name centerName email role')
-      .sort({ createdAt: -1 });
-    res.json(orders);
+    }).sort({ createdAt: -1 });
+    res.json(await hydrateSales(orders));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -1022,13 +1020,13 @@ router.patch('/orders/:id/status', auth, async (req, res) => {
       req.params.id,
       updateData,
       { new: true }
-    ).populate('sellerId', 'name email phone role');
+    );
     
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
     
-    res.json(order);
+    res.json((await hydrateSales(order))[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -1038,10 +1036,8 @@ router.patch('/orders/:id/status', auth, async (req, res) => {
 router.get('/my-sales', auth, async (req, res) => {
   try {
     const sales = await WasteSale.find({ sellerId: req.userId })
-      .populate('sellerId', 'name email role')
-      .populate('recyclerId', 'name centerName email role')
       .sort({ createdAt: -1 });
-    res.json(sales);
+    res.json(await hydrateSales(sales));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -1050,10 +1046,8 @@ router.get('/my-sales', auth, async (req, res) => {
 // Debug: Get all waste sales
 router.get('/debug/sales', async (req, res) => {
   try {
-    const sales = await WasteSale.find()
-      .populate('sellerId', 'name email role')
-      .populate('recyclerId', 'name centerName email role');
-    res.json(sales);
+    const sales = await WasteSale.find();
+    res.json(await hydrateSales(sales));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

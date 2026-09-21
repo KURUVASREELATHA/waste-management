@@ -12,7 +12,6 @@ import { CitizenDashboard } from "./pages/CitizenDashboard";
 import { WorkerDashboard } from "./pages/WorkerDashboard";
 import { VehicleTracking } from "./pages/VehicleTracking";
 import { TestLocationTracking } from "./pages/TestLocationTracking";
-import { RecyclingCenter } from "./pages/RecyclingCenter";
 import { RecyclingCenterDashboard } from "./pages/RecyclingCenterDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminLoginPage } from "./pages/AdminLoginPage";

@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import WasteSale from '../models/WasteSale.js';
 import RecyclingCenter from '../models/RecyclingCenter.js';
+import { hydrateSales } from '../utils/hydrateSale.js';
 
 const router = express.Router();
 
@@ -23,8 +24,8 @@ router.get('/center/:centerId/pending', async (req, res) => {
     const sales = await WasteSale.find({ 
       recyclerId: req.params.centerId,
       status: 'pending'
-    }).populate('sellerId', 'name');
-    res.json(sales);
+    });
+    res.json(await hydrateSales(sales));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -37,8 +38,8 @@ router.get('/center/:centerId/accepted', async (req, res) => {
       recyclerId: req.params.centerId,
       status: 'accepted',
       paymentStatus: 'pending'
-    }).populate('sellerId', 'name');
-    res.json(sales);
+    });
+    res.json(await hydrateSales(sales));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -72,9 +73,9 @@ router.patch('/:id/status', async (req, res) => {
       req.params.id,
       updateData,
       { new: true }
-    ).populate('sellerId', 'name').populate('recyclerId', 'name');
+    );
     
-    res.json(sale);
+    res.json((await hydrateSales(sale))[0]);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -86,10 +87,8 @@ router.get('/municipality/:municipalityId/history', async (req, res) => {
     const sales = await WasteSale.find({ 
       sellerId: req.params.municipalityId,
       status: { $in: ['accepted', 'completed'] }
-    })
-    .populate('recyclerId', 'name centerName')
-    .sort({ createdAt: -1 });
-    res.json(sales);
+    }).sort({ createdAt: -1 });
+    res.json(await hydrateSales(sales));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -117,10 +116,8 @@ router.patch('/:id/payment', async (req, res) => {
     sale.paidAt = new Date();
     
     await sale.save();
-    await sale.populate('sellerId', 'name');
-    await sale.populate('recyclerId', 'name');
     
-    res.json(sale);
+    res.json((await hydrateSales(sale))[0]);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
